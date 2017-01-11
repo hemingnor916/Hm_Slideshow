@@ -1,16 +1,11 @@
 package hm.hm_slideshow;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
@@ -35,7 +30,7 @@ import java.util.List;
  * Origin：https://ljuns.github.io/2016/11/21/CycleRotationView-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8E%A7%E4%BB%B6%E4%B9%8B%E8%BD%AE%E6%92%AD%E5%9B%BE
  * Mender: hemingyang
  * Whats different: easier to use
- *
+ * <p>
  * Step:
  * 1. compile 'com.squareup.picasso:picasso:2.3.2'
  * 2. Copy this file to your project and 'Rebuild' your project.
@@ -45,61 +40,20 @@ import java.util.List;
 
 public class Hm_slideShow extends FrameLayout {
 
-    Drawable drawable_normal = new Drawable() {
-        @Override
-        public void draw(Canvas canvas) {
-            Paint p = new Paint();
-            p.setColor(Color.parseColor("#66000000"));
-            canvas.drawCircle(10, 10, 10, p);
-        }
-
-        @Override
-        public void setAlpha(int alpha) {
-
-        }
-
-        @Override
-        public void setColorFilter(ColorFilter colorFilter) {
-
-        }
-
-        @Override
-        public int getOpacity() {
-            return PixelFormat.UNKNOWN;
-        }
-    };
-    Drawable drawable_selected = new Drawable() {
-        @Override
-        public void draw(Canvas canvas) {
-            Paint p = new Paint();
-            p.setColor(Color.parseColor("#ffffff"));
-            canvas.drawCircle(10, 10, 10, p);
-        }
-
-        @Override
-        public void setAlpha(int alpha) {
-
-        }
-
-        @Override
-        public void setColorFilter(ColorFilter colorFilter) {
-
-        }
-
-        @Override
-        public int getOpacity() {
-            return PixelFormat.UNKNOWN;
-        }
-    };
+    private int color_indicator_normal = Color.parseColor("#66000000");//小圆点
+    private int color_indicator_selected = Color.parseColor("#ffffff");//小圆点
+    private Drawable drawable_indicator_normal;//小圆点
+    private Drawable drawable_indicator_selected;//小圆点
     private Context mContext;
     private ViewPager mViewPager;
-    private LinearLayout mPointGroup;
+    private LinearLayout mPointGroup;//小圆点的父布局
     private List<ImageView> mList; // 资源集合
     private Handler mHandler;
     private int pointSize = 20; // 小圆点的大小，默认为20dp
     private int pointMargin = 20; // 与前面一个小圆点的距离，默认为20dp
     private long lastPageChangeTime = 0;
     private OnItemClickListener mListener;
+    private int pageDuration = 3000;
 
     public Hm_slideShow(Context context) {
         super(context);
@@ -108,10 +62,78 @@ public class Hm_slideShow extends FrameLayout {
     public Hm_slideShow(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        initIndicatorColor();
         this.mContext = context;
         mHandler = new Handler();
         mList = new ArrayList();
         initView(mContext);
+    }
+
+    public int getColor_indicator_normal() {
+        return color_indicator_normal;
+    }
+
+    public void setColor_indicator_normal(int color_indicator_normal) {
+        this.color_indicator_normal = color_indicator_normal;
+        initIndicatorColor();
+    }
+
+    public int getColor_indicator_selected() {
+        return color_indicator_selected;
+    }
+
+    public void setColor_indicator_selected(int color_indicator_selected) {
+        this.color_indicator_selected = color_indicator_selected;
+        initIndicatorColor();
+    }
+
+    private void initIndicatorColor() {
+        drawable_indicator_normal = new Drawable() {
+            @Override
+            public void draw(Canvas canvas) {
+                Paint p = new Paint();
+                p.setColor(color_indicator_normal);
+                canvas.drawCircle(pointSize / 2, pointSize / 2, pointSize / 2, p);
+            }
+
+            @Override
+            public void setAlpha(int alpha) {
+
+            }
+
+            @Override
+            public void setColorFilter(ColorFilter colorFilter) {
+
+            }
+
+            @Override
+            public int getOpacity() {
+                return PixelFormat.UNKNOWN;
+            }
+        };
+        drawable_indicator_selected = new Drawable() {
+            @Override
+            public void draw(Canvas canvas) {
+                Paint p = new Paint();
+                p.setColor(color_indicator_selected);
+                canvas.drawCircle(pointSize / 2, pointSize / 2, pointSize / 2, p);
+            }
+
+            @Override
+            public void setAlpha(int alpha) {
+
+            }
+
+            @Override
+            public void setColorFilter(ColorFilter colorFilter) {
+
+            }
+
+            @Override
+            public int getOpacity() {
+                return PixelFormat.UNKNOWN;
+            }
+        };
     }
 
     /**
@@ -125,7 +147,6 @@ public class Hm_slideShow extends FrameLayout {
         LinearLayout linear = new LinearLayout(mContext);
 
         //初始化父布局
-//        int height = 600;
         RelativeLayout.LayoutParams params_relatvie = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         relative.setLayoutParams(params_relatvie);
 
@@ -144,18 +165,14 @@ public class Hm_slideShow extends FrameLayout {
         RelativeLayout.LayoutParams params_toParent = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         params_toParent.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);//在底部
         params_toParent.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);//在右边
-        params_toParent.rightMargin = 20;
-        params_toParent.bottomMargin = 20;
+        params_toParent.rightMargin = pointMargin;
+        params_toParent.bottomMargin = pointMargin;
         relative.addView(linear, params_toParent);
 
         mViewPager = pager;
         mPointGroup = linear;
 
         addView(relative);
-//        View view = LayoutInflater.from(mContext)
-//                .inflate(R.layout.cycle_rotation_layout, this, true);
-//        mViewPager = (ViewPager) view.findViewById(R.id.viewPager);
-//        mPointGroup = (LinearLayout) view.findViewById(R.id.pointGroup);
     }
 
     /**
@@ -173,21 +190,8 @@ public class Hm_slideShow extends FrameLayout {
             // 创建 ImageView，并设置图片
             ImageView img = new ImageView(mContext);
             img.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            try {
-                Picasso.with(mContext).load(urls[i]).into(img);
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-
-//            Glide.with(mContext)
-//                    .load(urls[i])
-////                    .placeholder(R.mipmap.ic_launcher)
-////                    .error("http://p1.so.qhmsg.com/t019beddcaef2c8592b.jpg")
-//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                    .crossFade()
-//                    .into(img);
+            Picasso.with(mContext).load(urls[i]).into(img);
             mList.add(img);
-
             makePoints(i);
         }
 
@@ -228,8 +232,6 @@ public class Hm_slideShow extends FrameLayout {
 
 
         // 创建小圆点，实质也是 ImageView
-
-
         ImageView point = new ImageView(mContext);
 
         // 小圆点布局参数
@@ -238,9 +240,9 @@ public class Hm_slideShow extends FrameLayout {
         // 第2个起才设置左边距
         if (i > 0) {
             params.leftMargin = pointMargin;
-            point.setImageDrawable(drawable_normal);
+            point.setImageDrawable(drawable_indicator_normal);
         } else {
-            point.setImageDrawable(drawable_selected);
+            point.setImageDrawable(drawable_indicator_selected);
         }
 
         point.setLayoutParams(params); // 给小圆点设置参数
@@ -266,13 +268,11 @@ public class Hm_slideShow extends FrameLayout {
             public void onPageSelected(int position) {
                 position = position % mList.size();
                 // 设置当前圆点选中
-//                mPointGroup.getChildAt(position).setSelected(true);
                 ImageView iv_xuanzhong = (ImageView) mPointGroup.getChildAt(position);
-                iv_xuanzhong.setImageDrawable(drawable_selected);
+                iv_xuanzhong.setImageDrawable(drawable_indicator_selected);
                 // 设置前一个圆点不选中
-//                mPointGroup.getChildAt(lastPosition).setSelected(false);
                 ImageView iv_qianyige = (ImageView) mPointGroup.getChildAt(lastPosition);
-                iv_qianyige.setImageDrawable(drawable_normal);
+                iv_qianyige.setImageDrawable(drawable_indicator_normal);
                 lastPosition = position;
             }
 
@@ -280,6 +280,14 @@ public class Hm_slideShow extends FrameLayout {
             public void onPageScrollStateChanged(int state) {
             }
         });
+    }
+
+    public int getPageDuration() {
+        return pageDuration;
+    }
+
+    public void setPageDuration(int pageDuration) {
+        this.pageDuration = pageDuration;
     }
 
     /**
@@ -291,7 +299,7 @@ public class Hm_slideShow extends FrameLayout {
             @Override
             public void run() {
                 long pageStayeddTime = new Date().getTime() - lastPageChangeTime;
-                if (pageStayeddTime > 2500) {
+                if (pageStayeddTime > pageDuration * 0.9) {
                     // 当前选中的 item
                     int currentItem = mViewPager.getCurrentItem();
                     // 判断是否是最后一个 item
@@ -301,12 +309,10 @@ public class Hm_slideShow extends FrameLayout {
                         mViewPager.setCurrentItem(currentItem + 1);
                     }
                 }
-
-
                 // 不断给自己发消息
-                mHandler.postDelayed(this, 3000);
+                mHandler.postDelayed(this, pageDuration);
             }
-        }, 3000);
+        }, pageDuration);
     }
 
     /**
@@ -350,76 +356,6 @@ public class Hm_slideShow extends FrameLayout {
 
     public interface OnItemClickListener {
         void onItemClick(View view, int position);
-    }
-
-    public class RoundImageView extends ImageView {
-
-        private Paint paint;
-
-        public RoundImageView(Context context) {
-            this(context, null);
-        }
-
-        public RoundImageView(Context context, AttributeSet attrs) {
-            this(context, attrs, 0);
-        }
-
-        public RoundImageView(Context context, AttributeSet attrs, int defStyle) {
-            super(context, attrs, defStyle);
-            paint = new Paint();
-
-        }
-
-        /**
-         * 绘制圆形图片
-         *
-         * @author caizhiming
-         */
-        @Override
-        protected void onDraw(Canvas canvas) {
-
-            Drawable drawable = getDrawable();
-            if (null != drawable) {
-                Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-                Bitmap b = getCircleBitmap(bitmap, 14);
-                final Rect rectSrc = new Rect(0, 0, b.getWidth(), b.getHeight());
-                final Rect rectDest = new Rect(0, 0, getWidth(), getHeight());
-                paint.reset();
-                canvas.drawBitmap(b, rectSrc, rectDest, paint);
-
-            } else {
-                super.onDraw(canvas);
-            }
-        }
-
-        /**
-         * 获取圆形图片方法
-         *
-         * @param bitmap
-         * @param pixels
-         * @return Bitmap
-         * @author caizhiming
-         */
-        private Bitmap getCircleBitmap(Bitmap bitmap, int pixels) {
-            Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-                    bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(output);
-
-            final int color = 0xff424242;
-
-            final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-            paint.setAntiAlias(true);
-            canvas.drawARGB(0, 0, 0, 0);
-            paint.setColor(color);
-            int x = bitmap.getWidth();
-
-            canvas.drawCircle(x / 2, x / 2, x / 2, paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, rect, rect, paint);
-            return output;
-
-
-        }
     }
 
     /**
