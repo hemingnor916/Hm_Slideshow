@@ -18,7 +18,7 @@
         slideShow.setOnItemClickListener();
 
 
-# Step:
+# Steps:
  1. compile 'com.squareup.picasso:picasso:2.3.2'
  2. Copy this file to your project and 'Rebuild' your project.
  3. Add this code to your layout xml :"<yourPackageName.Hm_slideShow></yourPackageName.Hm_slideShow>"
