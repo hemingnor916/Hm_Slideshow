@@ -2,6 +2,8 @@
 简单几个步骤，轻松实现Android轮播图。
 说明：本控件原作者为ljuns，本人基于ljuns的作品进行简单的修改，从而达到‘更容易使用’的目的，仅此而已。关于此控件的不足之处以及优化方案，欢迎大家献言献策。
 
+![Image text](https://github.com/hemingnor916/Hm_Slideshow/blob/master/demo/demo.png?raw=true)
+
 # 使用
         1.添加引用 compile 'com.squareup.picasso:picasso:2.3.2' ，用于显示网络图片
         2.将Hm_slideShow.java复制项目中。
