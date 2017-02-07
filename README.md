@@ -19,9 +19,14 @@
 
 
 # Steps:
+
  1. compile 'com.squareup.picasso:picasso:2.3.2'
  2. Copy this file to your project and 'Rebuild' your project.
- 3. Add this code to your layout xml : <yourPackageName.Hm_slideShow></yourPackageName.Hm_slideShow>
+ 3. Add this code to your layout xml ： 
+       <hm.hm_slideshow.Hm_slideShow
+        android:id="@+id/slideShow"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"></hm.hm_slideshow.Hm_slideShow>
  4. Use Hm_slideShow.setUrls() or Hm_slideShow.setImages() method show images.
  
  ps:求英文版readme
