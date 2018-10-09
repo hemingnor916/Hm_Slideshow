@@ -39,7 +39,6 @@ import java.util.List;
  */
 
 public class Hm_slideShow extends FrameLayout {
-
     private int color_indicator_normal = Color.parseColor("#66000000");//小圆点
     private int color_indicator_selected = Color.parseColor("#ffffff");//小圆点
     private Drawable drawable_indicator_normal;//小圆点
@@ -181,6 +180,10 @@ public class Hm_slideShow extends FrameLayout {
      * @param urls：图片的URL
      */
     public void setUrls(String[] urls) {
+        if (mPointGroup != null) {
+            mPointGroup.removeAllViews();
+        }
+        mList = new ArrayList<>();
         // 数据集合为空时隐藏当前布局
         if (urls == null || urls.length == 0) {
             this.setVisibility(GONE);
@@ -205,6 +208,10 @@ public class Hm_slideShow extends FrameLayout {
      * @param images：图片的集合
      */
     public void setImages(int[] images) {
+        if (mPointGroup != null) {
+            mPointGroup.removeAllViews();
+        }
+        mList = new ArrayList<>();
         // 数据集合为空时隐藏当前布局
         if (images == null || images.length == 0) {
             this.setVisibility(GONE);
@@ -407,3 +414,4 @@ public class Hm_slideShow extends FrameLayout {
         }
     }
 }
+
